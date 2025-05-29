@@ -128,36 +128,6 @@ this command is analyzed for error messages."
     "windows-powershell" "windows-shell" "working-directory")
   "Just built-ins for tree-sitter font-locking.")
 
-(defvar just-ts--builtin-functions
-  (let ((functions
-         '(;; https://just.systems/man/en/functions.html
-           "absolute_path" "append" "arch" "blake3" "blake3_file"
-           "cache_directory" "canonicalize" "capitalize" "choose"
-           "clean" "config_directory" "config_local_directory"
-           "data_directory" "data_local_directory" "datetime"
-           "datetime_utc" "encode_uri_component" "env" "env_var"
-           "env_var_or_default" "error" "executable_directory"
-           "extension" "file_name" "file_stem" "home_directory"
-           "invocation_directory" "invocation_dir_native"
-           "invocation_directory_native" "is_dependency" "join"
-           "just_executable" "just_pid" "justfile"
-           "justfile_directory" "kebabcase" "lowercamelcase"
-           "lowercase" "module_directory" "module_file" "num_cpus"
-           "os" "os_family" "parent_directory" "path_exists" "prepend"
-           "quote" "read" "replace" "replace_regex" "require"
-           "semver_matches" "sha256" "sha256_file" "shell"
-           "shoutykebabcase" "shoutysnakecase" "snakecase"
-           "source_directory" "source_file" "style" "titlecase" "trim"
-           "trim_end" "trim_end_match" "trim_end_matches" "trim_start"
-           "trim_start_match" "trim_start_matches" "uppercamelcase"
-           "uppercase" "uuid" "which" "without_extension")))
-    ;; "All functions ending in _directory can be abbreviated to _dir."
-    ;; https://just.systems/man/en/functions.html#functions
-    (dolist (fun functions functions)
-      (when (string-suffix-p "_directory" fun)
-        (push (substring fun 0 -6) functions))))
-  "Just built-in functions for tree-sitter font-locking.")
-
 (defvar just-ts--keywords
   '("export" "import" "mod"
     "alias" "set" "shell"
@@ -226,9 +196,7 @@ this command is analyzed for error messages."
 
    :language 'just
    :feature 'function
-   `((function_call
-      (identifier) @font-lock-function-call-face
-      (:match ,(regexp-opt just-ts--builtin-functions 'symbols) @font-lock-function-call-face)))
+   '((function_call (identifier) @font-lock-function-call-face))
 
    :language 'just
    :feature 'definition
@@ -334,7 +302,6 @@ Return nil if there is no name or if NODE is not a defun node."
 
     (treesit-major-mode-setup)))
 
-;;;###autoload
 (when (treesit-ready-p 'just)
   (add-to-list 'auto-mode-alist '("/\\.?[Jj]ustfile\\'" . just-ts-mode))
   (add-to-list 'interpreter-mode-alist '("just" . just-ts-mode)))
